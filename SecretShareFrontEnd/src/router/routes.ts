@@ -1,7 +1,7 @@
 const routes = [
     { 
         path: '/',
-        component: () => import('../Layouts/MainLayout.vue'),
+        component: () => import('../layouts/MainLayout.vue'),
         children: [
             { 
                 path: '/secretShare',

@@ -33,6 +33,8 @@ builder.Services.AddDbContext<SebasDbContext>(options =>
 .AddTransient<SharedSecretRepository>()
 .AddTransient<EncryptionService>();
 
+builder.Services.AddHostedService<ExpiredSecretCleanupService>();
+
 builder.WebHost.UseKestrel();
 
 var app = builder.Build();

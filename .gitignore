@@ -364,5 +364,7 @@ FodyWeavers.xsd
 
 #Custom
 /SecretShareApi/appsettings.Local.json
+/SecretShareApi/appsettings.Development.json
 /.editorconfig
 /SecretShareApi.lutconfig
+.claude/

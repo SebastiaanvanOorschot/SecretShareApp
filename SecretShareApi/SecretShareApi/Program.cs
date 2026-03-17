@@ -28,7 +28,7 @@ options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoop
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
 builder.Services.AddDbContext<SebasDbContext>(options =>
-                    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")))
+                    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))
 
 .AddTransient<SharedSecretRepository>()
 .AddTransient<EncryptionService>();

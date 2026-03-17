@@ -106,6 +106,7 @@ lerna-debug.log*
 .DS_Store
 Thumbs.db
 *.tmp
+nul
 
 # ===== Claude =====
 .claude/

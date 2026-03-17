@@ -35,8 +35,6 @@ builder.Services.AddDbContext<SebasDbContext>(options =>
 
 builder.Services.AddHostedService<ExpiredSecretCleanupService>();
 
-builder.WebHost.UseKestrel();
-
 var app = builder.Build();
 
 // Apply pending migrations on startup

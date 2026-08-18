@@ -89,7 +89,7 @@ const v$ = useVuelidate(rules, formData);
 const submitForm = async () => {
     const valid = await v$.value.$validate();
     if (valid) {         
-        await axios.post(process.env.VITE_SECRETSHAREAPI_URL +'/api/secret/store', formData)
+        await axios.post(import.meta.env.VITE_SECRETSHAREAPI_URL +'/api/secret/store', formData)
             .then(returnData => {
                 url.value = returnData.data;
                 navigator.clipboard.writeText(returnData.data);

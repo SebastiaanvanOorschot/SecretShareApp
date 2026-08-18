@@ -58,7 +58,7 @@ const v$ = useVuelidate(rules, formData);
 const submitForm = async () => {
     const valid = await v$.value.$validate();
     if (valid) {
-        await axios.post(process.env.VITE_SECRETSHAREAPI_URL + '/api/secret/retrieve', formData)
+        await axios.post(import.meta.env.VITE_SECRETSHAREAPI_URL + '/api/secret/retrieve', formData)
             .then(returnData => {
                 secret.value = returnData.data;
                 fadeIn.value.style.animationPlayState = "running";

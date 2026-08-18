@@ -59,7 +59,7 @@ namespace SecretShareApi.Repositories
         }
 
         
-        /// Checks if the given passphrase is correct by matching it to token of SharedSecret then retrieves, decrypt's and deletes the secret
+        /// Checks if the passphrase is correct by matching it to token of SharedSecret then retrieves, decrypt's and deletes the secret
         public virtual async Task<string> VerifyAndDecryptSecret(RetrieveSecretDto dto)
         {
             var secret = "";

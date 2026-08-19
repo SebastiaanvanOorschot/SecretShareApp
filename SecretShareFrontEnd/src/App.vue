@@ -1,9 +1,7 @@
 <template>
 
-  <header class="site-header">
-    <div class="header-inner">
-      <span class="brand">sebaslive</span>
-    </div>
+  <header class="topbar">
+    <span class="brand">sebaslive</span>
   </header>
 
   <main>
@@ -12,9 +10,7 @@
     </div>
   </main>
 
-  <footer class="site-footer">
-    <span>sebaslive.xyz</span>
-  </footer>
+  <footer>sebaslive.xyz</footer>
 
 </template>
 

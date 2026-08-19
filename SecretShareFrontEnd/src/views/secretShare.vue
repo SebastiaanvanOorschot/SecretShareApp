@@ -36,7 +36,7 @@
                 </div>                
                 
                 <div class="column submitContainer" data-text="Click this button to store the secret and copy the retrieval link to your clipboard">                    
-                    <a href="#" type="submit" class="row submitButton" v-on:click="submitForm" style="--clr:#00dfc4">
+                    <a href="#" type="submit" class="row submitButton" v-on:click="submitForm" style="--clr:var(--accent)">
                         <span>Tell someone else!</span><i></i>
                     </a>                 
                 </div>
@@ -72,8 +72,8 @@ const formData = reactive({
 
 watch(() => formData.lifetime, (newValue) =>{
     if (newValue){
-        currentBorder.value = '1px solid #00DFC4';
-        currentColor.value = '#00DFC4';
+        currentBorder.value = '1px solid #10b981';
+        currentColor.value = '#10b981';
         currentBoxShadow.value = '0 0 5px #fff';
     }
 });

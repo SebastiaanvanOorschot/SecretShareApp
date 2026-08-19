@@ -16,7 +16,7 @@
                 </div>
                 
                 <div class="column retrieveSubmitContainer" data-text="Click this button to submit your passphrase and retrieve the secret if it was correct.">                    
-                    <a href="#" type="submit" v-on:click="submitForm" class="row submitButton" style="--clr:#00dfc4"><span>come a little closer..</span><i></i></a>
+                    <a href="#" type="submit" v-on:click="submitForm" class="row submitButton" style="--clr:var(--accent)"><span>come a little closer..</span><i></i></a>
                 </div>  
                 <div class="column alertContainerRetrieve">
                     <div ref="fadeIn" class="fadeIn">

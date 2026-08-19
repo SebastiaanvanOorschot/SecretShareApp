@@ -1,9 +1,7 @@
 <template>
-    <head>        
+    <head>
     </head>
-        <div class="topnav">
-        </div>
-        <body>       
+        <body>     
             <div class="column">   
                 <div class="column helpTextContainer" v-if="$route.path == '/'">
                     <p>
@@ -11,7 +9,7 @@
                     </p>
                 </div>
                 <div class="column">                    
-                    <RouterLink to="/secretShare" class="row submitButton" style="--clr:#00dfc4"><span>Tell me your secret..</span><i></i></RouterLink>
+                    <RouterLink to="/secretShare" class="row submitButton" style="--clr:var(--accent)"><span>Tell me your secret..</span><i></i></RouterLink>
                 </div>
                 <div>
                     <RouterView />

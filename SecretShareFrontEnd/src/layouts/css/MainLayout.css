@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
 * {
   margin: 0;
   padding: 0;
@@ -8,23 +9,55 @@
 
 :root {
   --white: rgb(255, 255, 255);
-  --teal: #00dfc4;
-  --gunmetal: #1D2B3A;
+  --accent: #10b981;
+  --bg: #0a0e14;
   --outline: rgba(255, 255, 255, 0.493);
   --outline-glow: rgb(255, 255, 255);
-  --red: #FF0035;
+  --red: #ef4444;
 }
 
-/* Top nav */
-.topnav {
+/* Site header */
+.site-header {
   position: fixed;
   z-index: 1;
   top: 0;
   left: 0;
-  height: 50px;
-  width: 100%;  
-  background-color: var(--teal);
-  box-shadow: 0px 3px 3px rgb(0, 0, 0);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background-color: var(--bg);
+}
+.site-header .header-inner {
+  width: min(800px, 92%);
+  height: 70px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.site-header .brand {
+  font-family: 'Space Mono', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--white);
+}
+
+/* Site footer */
+.site-footer {
+  position: fixed;
+  z-index: 1;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+  pointer-events: none;
+}
+.site-footer span {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.25);
 }
 
 
@@ -36,7 +69,7 @@ body {
   flex-direction: column;
   height: 100dvh;
   width: 100dvw;
-  background: var(--gunmetal);  
+  background: var(--bg);  
   overflow: hidden;
 }
 
@@ -44,10 +77,10 @@ body {
 /* intro text */
 .helpTextContainer {
   position: relative;
-  color: var(--teal);
-  text-shadow: 0 0 10px var(--teal),
-  0 0 30px var(--teal),
-  0 0 80px var(--teal);
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent),
+  0 0 30px var(--accent),
+  0 0 80px var(--accent);
   text-align: left;
 }
 
@@ -104,7 +137,7 @@ body {
   content: '';
   position: absolute;
   inset: 2px;
-  background: var(--gunmetal);
+  background: var(--bg);
 }
 .submitButton span {
   position: relative;
@@ -121,7 +154,7 @@ body {
   left: 80%;
   width: 10px;
   height: 4px;
-  background: var(--gunmetal);
+  background: var(--bg);
   transform: translate(-50%) skewX(325deg);
   transition: 0.3s;
 }
@@ -140,7 +173,7 @@ body {
   left: 20%;
   width: 10px;
   height: 4px;
-  background: var(--gunmetal);
+  background: var(--bg);
   transform: translate(-50%) skewX(325deg);
   transition: 0.3s;
 }
@@ -151,7 +184,7 @@ body {
   left: 20%;
   width: 10px;
   height: 4px;
-  background: var(--gunmetal);
+  background: var(--bg);
   transform: translate(-50%) skewX(325deg);
   transition: 0.3s;
 }
@@ -168,9 +201,9 @@ body {
 /* help button */
 .help-btn {
   position: relative;
-  color: var(--teal);
+  color: var(--accent);
   padding: 0.6em 1.2em;
-  border: 0.15em solid var(--teal);
+  border: 0.15em solid var(--accent);
   border-radius: 0.45em;
   background: none;
   perspective: 2em;
@@ -183,20 +216,20 @@ body {
   transition: 0.3s;
   transform: translateY(-30px);
 
-  -webkit-box-shadow: inset 0px 0px 0.5em 0px var(--teal),
-    0px 0px 0.5em 0px var(--teal);
-  -moz-box-shadow: inset 0px 0px 0.5em 0px var(--teal),
-    0px 0px 0.5em 0px var(--teal);
-  box-shadow: inset 0px 0px 0.5em 0px var(--teal),
-    0px 0px 0.5em 0px var(--teal);
+  -webkit-box-shadow: inset 0px 0px 0.5em 0px var(--accent),
+    0px 0px 0.5em 0px var(--accent);
+  -moz-box-shadow: inset 0px 0px 0.5em 0px var(--accent),
+    0px 0px 0.5em 0px var(--accent);
+  box-shadow: inset 0px 0px 0.5em 0px var(--accent),
+    0px 0px 0.5em 0px var(--accent);
   animation: border-flicker 2s linear infinite;
 }
 .glowing-txt {
   -webkit-text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3),
-    0 0 0.45em var(--teal);
+    0 0 0.45em var(--accent);
   -moz-text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3),
-    0 0 0.45em var(--teal);
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--teal);
+    0 0 0.45em var(--accent);
+  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--accent);
   animation: text-flicker 3s linear infinite;
 }
 .faulty-letter {
@@ -213,7 +246,7 @@ body {
   opacity: 0.1;
   filter: blur(1em);
   transform: translateY(100%) rotateX(95deg) scale(1.4, 0.35);
-  background: var(--teal);
+  background: var(--accent);
   pointer-events: none;
 }
 .help-btn::after {
@@ -225,8 +258,8 @@ body {
   bottom: 0;
   opacity: 0;
   z-index: -1;
-  background-color: var(--teal);
-  box-shadow: 0 0 2em 0.2em var(--teal);
+  background-color: var(--accent);
+  box-shadow: 0 0 2em 0.2em var(--accent);
   transition: opacity 100ms linear;
 }
 .help-btn:hover {
@@ -305,10 +338,10 @@ body {
   width: 100%;
   padding: 10px;
   border: 1px solid var(--outline);
-  background: var(--gunmetal);
+  background: var(--bg);
   border-radius: 5px;
   outline: none;
-  color: var(--teal);
+  color: var(--accent);
   font-size: 1rem;
   transition: 0.3s;
 }
@@ -329,37 +362,37 @@ body {
   transform: translateX(-10px) translateY(22px);
   font-size: 0.70rem;
   padding: 0 10px;
-  background: var(--gunmetal);
+  background: var(--bg);
   border-left: 1px solid var(--outline);
   border-right: 1px solid var(--outline);
   letter-spacing: 0.2em;
 }
 .inputBox input:focus ~ span {
-  color: var(--teal);
+  color: var(--accent);
   transform: translateX(10px) translateY(-22px);
   font-size: 0.65rem;
   padding: 0 10px;
-  background: var(--gunmetal);
-  border-left: 1px solid var(--teal);
-  border-right: 1px solid var(--teal);
+  background: var(--bg);
+  border-left: 1px solid var(--accent);
+  border-right: 1px solid var(--accent);
   letter-spacing: 0.2em;   
 }
 .inputBox input:focus {
-  border: 1px solid var(--teal);
+  border: 1px solid var(--accent);
   box-shadow: 0 0 5px var(--white);
 }
 .inputBox input:not(:placeholder-shown) {
-  border: 1px solid var(--teal);
+  border: 1px solid var(--accent);
   box-shadow: 0 0 5px var(--white);
 }
 .inputBox input:not(:placeholder-shown) ~ span {
-  color: var(--teal);
+  color: var(--accent);
   transform: translateX(10px) translateY(-22px);
   font-size: 0.65rem;
   padding: 0 10px;
-  background: var(--gunmetal);
-  border-left: 1px solid var(--teal);
-  border-right: 1px solid var(--teal);
+  background: var(--bg);
+  border-left: 1px solid var(--accent);
+  border-right: 1px solid var(--accent);
   letter-spacing: 0.2em; 
 }
 
@@ -378,7 +411,7 @@ body {
   color: var(--outline);
   text-transform: uppercase;
   transition: 0.3s;
-  background: var(--gunmetal);
+  background: var(--bg);
   border: 1px solid var(--outline);
   padding-left: 5px;
   padding-right: 5px;
@@ -390,7 +423,7 @@ body {
   transform: translateX(112px) translateY(50px);
   font-size: 0.70rem;
   padding: 0 10px;
-  background: var(--gunmetal);
+  background: var(--bg);
   border-left: 1px solid var(--outline);
   border-right: 1px solid var(--outline);
   letter-spacing: 0.2em;
@@ -407,12 +440,12 @@ body {
 .radio input[type="radio"] {
   width: 6.5em; 
   height: 1.25em;
-  accent-color: var(--gunmetal);
+  accent-color: var(--bg);
   color: var(--outline);
 }
 .radio input[type="radio"]:checked ~ span {
-  color: var(--teal);
-  background: var(--gunmetal);
+  color: var(--accent);
+  background: var(--bg);
 }
 
 
@@ -465,20 +498,20 @@ body {
   position: absolute;
   bottom: -55px;
   content:attr(data-text);
-  color: var(--teal);
-  text-shadow: 0 0 10px var(--teal),
-  0 0 30px var(--teal),
-  0 0 80px var(--teal);
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent),
+  0 0 30px var(--accent),
+  0 0 80px var(--accent);
   opacity: 0;
 }
 .passphraseContainer::before {
   position: absolute;
   bottom: -55px;
   content:attr(data-text);
-  color: var(--teal);
-  text-shadow: 0 0 10px var(--teal),
-  0 0 30px var(--teal),
-  0 0 80px var(--teal);
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent),
+  0 0 30px var(--accent),
+  0 0 80px var(--accent);
   opacity: 0;
 }
 .retrievePassphraseContainer::before {
@@ -486,50 +519,50 @@ body {
   bottom: -30px;
   left: 5px;
   content:attr(data-text);
-  color: var(--teal);
-  text-shadow: 0 0 10px var(--teal),
-  0 0 30px var(--teal),
-  0 0 80px var(--teal);
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent),
+  0 0 30px var(--accent),
+  0 0 80px var(--accent);
   opacity: 0;
 }
 .lifetimeContainer::before {
   position: absolute;
   bottom: -55px;
   content:attr(data-text);
-  color: var(--teal);
-  text-shadow: 0 0 10px var(--teal),
-  0 0 30px var(--teal),
-  0 0 80px var(--teal);
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent),
+  0 0 30px var(--accent),
+  0 0 80px var(--accent);
   opacity: 0;
 }
 .submitContainer::before {
   position: absolute;
   bottom: -55px;
   content:attr(data-text);
-  color: var(--teal);
-  text-shadow: 0 0 10px var(--teal),
-  0 0 30px var(--teal),
-  0 0 80px var(--teal);
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent),
+  0 0 30px var(--accent),
+  0 0 80px var(--accent);
   opacity: 0;
 }
 .retrieveSubmitContainer::before {
   position: absolute;
   bottom: -85px;
   content:attr(data-text);
-  color: var(--teal);
-  text-shadow: 0 0 10px var(--teal),
-  0 0 30px var(--teal),
-  0 0 80px var(--teal);
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent),
+  0 0 30px var(--accent),
+  0 0 80px var(--accent);
   opacity: 0;
 }
 .retrieveInfoText::before {
   position: absolute;
   content:attr(data-text);
   top: -10px;
-  color: var(--teal);
-  text-shadow: 0 0 10px var(--teal),
-  0 0 30px var(--teal),
-  0 0 80px var(--teal);
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent),
+  0 0 30px var(--accent),
+  0 0 80px var(--accent);
   opacity: 0;
 }
 .help-btn:hover ~ .secretContainer::before {
@@ -558,20 +591,20 @@ body {
 /* alerts */
 .alertContainer {
   font-size: 1.7rem;
-  color: var(--teal);
-  text-shadow: 0 0 10px var(--teal),
-  0 0 30px var(--teal),
-  0 0 80px var(--teal);
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent),
+  0 0 30px var(--accent),
+  0 0 80px var(--accent);
   animation: flicker 3.5s linear infinite;
   animation-delay: 3s;
   text-align: center;
 }
 .alertContainerRetrieve {
   font-size: 1.7rem;
-  color: var(--teal);
-  text-shadow: 0 0 10px var(--teal),
-  0 0 30px var(--teal),
-  0 0 80px var(--teal);
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent),
+  0 0 30px var(--accent),
+  0 0 80px var(--accent);
   animation: flicker 3.5s linear infinite;
   animation-delay: 3s;
   text-align: center;

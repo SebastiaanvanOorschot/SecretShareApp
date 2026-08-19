@@ -70,11 +70,20 @@ namespace SecretShareApi.Repositories
 
             // Retrieve encrypted password
             var hashword = await SharedSecrets
-                .FilterByHashpraseAndUrlExtension(hashphrase, urlExtension)
+                .FilterByUrlExtension(urlExtension)
                 .SingleOrDefaultAsync();
 
             if (hashword == null)
             {
+                return secret;
+            }
+
+            if (hashword.Expire < DateTime.UtcNow)
+            {
+                // Secret has expired but was not yet cleaned up, remove it and treat as not found
+                _sebasDbContext.Entry(hashword).State = EntityState.Deleted;
+                await _sebasDbContext.SaveChangesAsync();
+
                 return secret;
             }
 

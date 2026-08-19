@@ -1,6 +1,5 @@
 <template>
-    <body>
-        <form @submit.prevent="submitForm">
+    <form @submit.prevent="submitForm">
             <div class="column">
                 <input name="urlExtension" v-model="formData.urlExtension" type="hidden" />                
 
@@ -26,9 +25,8 @@
                     <p ref="noTell" class="noTell">DON'T TELL ANYONE</p>                
                 </div>
             </div>
-        </form>
-    </body>
-</template>    
+    </form>
+</template>
  
 <script setup lang="ts">
 import { reactive, ref } from 'vue'; 

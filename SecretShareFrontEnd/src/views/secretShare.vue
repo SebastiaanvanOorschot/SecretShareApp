@@ -1,6 +1,5 @@
 <template>
-    <body>
-        <form @submit.prevent="submitForm">
+    <form @submit.prevent="submitForm">
             <div class="column">
                 <button class="row help-btn" type="button"><span class='glowing-txt'>H<span class='faulty-letter'>E</span>LP ME</span></button>
 
@@ -46,8 +45,7 @@
                 </div>   
             </div>
             
-        </form>
-    </body>
+    </form>
 </template>
 
 <script setup lang="ts">

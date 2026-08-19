@@ -17,7 +17,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(c =>
 {
-    c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());    
+    c.AddPolicy("AllowFrontend", options => options
+        .WithOrigins("http://localhost:5173", "https://secretshare.sebaslive.xyz")
+        .AllowAnyMethod()
+        .AllowAnyHeader());
 });
 
 builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
@@ -62,7 +65,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
-app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+app.UseCors("AllowFrontend");
 
 app.UseAuthorization();
 

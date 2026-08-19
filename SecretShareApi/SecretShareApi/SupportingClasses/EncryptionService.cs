@@ -14,7 +14,7 @@ namespace SecretShareApi.SupportingClasses
         private const int Keysize = 128;
 
         // This constant determines the number of iterations for the password bytes generation function.
-        private const int DerivationIterations = 1000;
+        private const int DerivationIterations = 600000;
 
         public EncryptionService() { }
 
@@ -25,7 +25,7 @@ namespace SecretShareApi.SupportingClasses
             var saltStringBytes = Generate128BitsOfRandomEntropy();
             var ivStringBytes = Generate128BitsOfRandomEntropy();
             var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
-            using (var password = new Rfc2898DeriveBytes(passPhrase, saltStringBytes, DerivationIterations))
+            using (var password = new Rfc2898DeriveBytes(passPhrase, saltStringBytes, DerivationIterations, HashAlgorithmName.SHA256))
             {
                 var keyBytes = password.GetBytes(Keysize / 8);
                 using (var AesKey = Aes.Create())
@@ -67,7 +67,7 @@ namespace SecretShareApi.SupportingClasses
             // Get the actual cipher text bytes by removing the first 64 bytes from the cipherText string.
             var cipherTextBytes = cipherTextBytesWithSaltAndIv.Skip((Keysize / 8) * 2).Take(cipherTextBytesWithSaltAndIv.Length - ((Keysize / 8) * 2)).ToArray();
 
-            using var password = new Rfc2898DeriveBytes(passPhrase, saltStringBytes, DerivationIterations);
+            using var password = new Rfc2898DeriveBytes(passPhrase, saltStringBytes, DerivationIterations, HashAlgorithmName.SHA256);
             var keyBytes = password.GetBytes(Keysize / 8);
             using (var symmetricKey = Aes.Create())
             {
@@ -91,11 +91,7 @@ namespace SecretShareApi.SupportingClasses
         private byte[] Generate128BitsOfRandomEntropy()
         {
             var randomBytes = new byte[16]; // 16 Bytes will give us 128 bits.
-            using (var rngCsp = new RNGCryptoServiceProvider())
-            {
-                // Fill the array with cryptographically secure random bytes.
-                rngCsp.GetBytes(randomBytes);
-            }
+            RandomNumberGenerator.Fill(randomBytes);
             return randomBytes;
         }
 

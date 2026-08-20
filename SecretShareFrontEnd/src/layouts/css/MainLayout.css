@@ -1,10 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;    
 }
 
 :root {
@@ -62,6 +60,16 @@ main {
 body {
   background: var(--bg);
   overflow: hidden;
+  font-family: 'Space Mono', monospace;
+}
+
+/* form controls do not inherit the document font by themselves, so the
+   inherit chain that starts on body has to be handed to them explicitly */
+input,
+button,
+textarea,
+select {
+  font-family: inherit;
 }
 
 /* volle-hoogte kolom: header boven, content midden, footer onder (HobbyHub .hub) */
@@ -77,9 +85,7 @@ body {
 .helpTextContainer {
   position: relative;
   color: var(--accent);
-  text-shadow: 0 0 10px var(--accent),
-  0 0 30px var(--accent),
-  0 0 80px var(--accent);
+  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.7em var(--accent);
   text-align: left;
 }
 
@@ -124,13 +130,15 @@ body {
   background: var(--clr);
   color: var(--clr);
   letter-spacing: 0.15em;
-  box-shadow: 0 0 1em var(--clr);
+  box-shadow: inset 0 0 0.5em 0 var(--clr),
+    0 0 0.5em 0 var(--clr);
 }
 .submitButton:focus {
   background: var(--clr);
   color: var(--clr);
   letter-spacing: 0.15em;
-  box-shadow: 0 0 1em var(--clr);
+  box-shadow: inset 0 0 0.5em 0 var(--clr),
+    0 0 0.5em 0 var(--clr);
 }
 .submitButton:before {
   content: '';
@@ -378,11 +386,13 @@ body {
 }
 .inputBox input:focus {
   border: 1px solid var(--accent);
-  box-shadow: 0 0 5px var(--white);
+  box-shadow: inset 0 0 0.35em 0 var(--accent),
+    0 0 0.35em 0 var(--accent);
 }
 .inputBox input:not(:placeholder-shown) {
   border: 1px solid var(--accent);
-  box-shadow: 0 0 5px var(--white);
+  box-shadow: inset 0 0 0.35em 0 var(--accent),
+    0 0 0.35em 0 var(--accent);
 }
 .inputBox input:not(:placeholder-shown) ~ span {
   color: var(--accent);
@@ -404,7 +414,11 @@ body {
   gap: 0px;
 }
 .lifetimeContainer label {
-  transform: translateX(-110px) translatey(-10px);
+  /* pinned to the left edge the way the input labels are, instead of being
+     centred and dragged back by a pixel offset that depends on the font */
+  align-self: flex-start;
+  margin-left: 10px;
+  transform: translateY(-10px);
   pointer-events: none;
   font-size: 1rem;
   color: var(--outline);
@@ -412,6 +426,7 @@ body {
   transition: 0.3s;
   background: var(--bg);
   border: 1px solid var(--outline);
+  border-radius: 5px;
   padding-left: 5px;
   padding-right: 5px;
   letter-spacing: 0.12em;
@@ -419,7 +434,10 @@ body {
 .lifetimeContainer i {
   position: absolute;
   color: var(--red);
-  transform: translateX(112px) translateY(50px);
+  /* nudged to line the right edge up with the .inputBox badges, which sit at
+     right:0 minus 10px; this one is centred, so the offset carries the width
+     of the word and had to follow the font change */
+  transform: translateX(108px) translateY(50px);
   font-size: 0.70rem;
   padding: 0 10px;
   background: var(--bg);
@@ -453,25 +471,25 @@ body {
   transition: transform 0.3s;
 }
 .help-btn:hover ~ .passphraseContainer {
-  transform: translateY(45px);
+  transform: translateY(58px);
 }
 .retrievePassphraseContainer {
   transition: transform 0.3s;
 }
 .help-btn:hover ~ .retrievePassphraseContainer {
-  transform: translateY(105px);
+  transform: translateY(114px);
 }
 .lifetimeContainer {
   transition: transform 0.3s;
 }
 .help-btn:hover ~ .lifetimeContainer {
-  transform: translateY(95px);
+  transform: translateY(116px);
 }
 .submitContainer {
   transition: transform 0.3s;
 }
 .help-btn:hover ~ .submitContainer {
-  transform: translateY(135px);
+  transform: translateY(150px);
 }
 .retrieveSubmitContainer {
   transition: transform 0.3s;
@@ -495,63 +513,51 @@ body {
 /* help menu text */
 .secretContainer::before {
   position: absolute;
-  bottom: -55px;
+  top: calc(100% + 6px);
   content:attr(data-text);
   color: var(--accent);
-  text-shadow: 0 0 10px var(--accent),
-  0 0 30px var(--accent),
-  0 0 80px var(--accent);
+  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--accent);
   opacity: 0;
 }
 .passphraseContainer::before {
   position: absolute;
-  bottom: -55px;
+  top: calc(100% + 6px);
   content:attr(data-text);
   color: var(--accent);
-  text-shadow: 0 0 10px var(--accent),
-  0 0 30px var(--accent),
-  0 0 80px var(--accent);
+  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--accent);
   opacity: 0;
 }
 .retrievePassphraseContainer::before {
   position: absolute;
-  bottom: -30px;
+  top: calc(100% + 6px);
   left: 5px;
   content:attr(data-text);
   color: var(--accent);
-  text-shadow: 0 0 10px var(--accent),
-  0 0 30px var(--accent),
-  0 0 80px var(--accent);
+  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--accent);
   opacity: 0;
 }
 .lifetimeContainer::before {
   position: absolute;
-  bottom: -55px;
+  top: calc(100% + 6px);
   content:attr(data-text);
   color: var(--accent);
-  text-shadow: 0 0 10px var(--accent),
-  0 0 30px var(--accent),
-  0 0 80px var(--accent);
+  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--accent);
   opacity: 0;
 }
 .submitContainer::before {
   position: absolute;
-  bottom: -55px;
+  top: calc(100% + 6px);
   content:attr(data-text);
   color: var(--accent);
-  text-shadow: 0 0 10px var(--accent),
-  0 0 30px var(--accent),
-  0 0 80px var(--accent);
+  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--accent);
   opacity: 0;
 }
 .retrieveSubmitContainer::before {
   position: absolute;
-  bottom: -85px;
+  top: calc(100% + 6px);
   content:attr(data-text);
   color: var(--accent);
-  text-shadow: 0 0 10px var(--accent),
-  0 0 30px var(--accent),
-  0 0 80px var(--accent);
+  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--accent);
   opacity: 0;
 }
 .retrieveInfoText::before {
@@ -559,9 +565,7 @@ body {
   content:attr(data-text);
   top: -10px;
   color: var(--accent);
-  text-shadow: 0 0 10px var(--accent),
-  0 0 30px var(--accent),
-  0 0 80px var(--accent);
+  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--accent);
   opacity: 0;
 }
 .help-btn:hover ~ .secretContainer::before {
@@ -640,8 +644,8 @@ body {
 
 /* On smaller screens, where width is less than 450px */
 @media screen and (max-width: 600px) {
-  * {
-    font-size: calc(97%);    
+  html {
+    font-size: calc(97%);
   }
 
   body {  
@@ -677,9 +681,6 @@ body {
   .lifetimeContainer {
     gap: 0px;
   }
-  .lifetimeContainer label {
-    transform: translateX(-90px) translatey(-10px);
-  }
   .radioGroup {
     gap: 0px;
     width: 100px;
@@ -696,24 +697,8 @@ body {
   }
 
   /* help menu text */
-  .secretContainer::before {
-    bottom: -40px;
-  }
-  .passphraseContainer::before {
-    bottom: -40px;;
-  }
   .retrievePassphraseContainer::before {
-    bottom: -25px;
     left: 0px;
-  }
-  .lifetimeContainer::before {
-    bottom: -40px;
-  }
-  .submitContainer::before {
-    bottom: -40px;
-  }
-  .retrieveSubmitContainer::before {
-    bottom: -45px;
   }
   .retrieveInfoText::before {
     top: 0px;
@@ -721,19 +706,19 @@ body {
 
   /* help menu movements */
   .help-btn:hover ~ .passphraseContainer {
-    transform: translateY(30px);
-  }
-  .help-btn:hover ~ .retrievePassphraseContainer {
     transform: translateY(65px);
   }
+  .help-btn:hover ~ .retrievePassphraseContainer {
+    transform: translateY(128px);
+  }
   .help-btn:hover ~ .lifetimeContainer {
-    transform: translateY(70px);
+    transform: translateY(130px);
   }
   .help-btn:hover ~ .submitContainer {
-    transform: translateY(100px);
+    transform: translateY(172px);
   }
   .help-btn:hover ~ .retrieveSubmitContainer {
-    transform: translateY(85px);
+    transform: translateY(147px);
   }
   .help-btn:hover ~ .alertContainer {
     transform: translateY(140px);
@@ -760,7 +745,7 @@ body {
   transition: transform 0.3s;
 }
 .help-btn:hover ~ .terminalContainer {
-  transform: translateY(170px);
+  transform: translateY(208px);
 }
 
 .neon-terminal {
@@ -1224,7 +1209,7 @@ body {
 
 @media screen and (max-width: 600px) {
   .help-btn:hover ~ .terminalContainer {
-    transform: translateY(140px);
+    transform: translateY(237px);
   }
   .neon-terminal {
     min-height: 165px;
@@ -1521,7 +1506,7 @@ body {
 
 @media screen and (max-width: 600px) {
   .help-btn:hover ~ .terminalContainerRetrieve {
-    transform: translateY(120px);
+    transform: translateY(212px);
   }
 }
 

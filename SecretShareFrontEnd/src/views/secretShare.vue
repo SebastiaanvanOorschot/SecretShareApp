@@ -72,7 +72,7 @@ const relit = ref(false);
 const terminalRun = ref(0);
 const currentBorder = ref('1px solid rgba(255, 255, 255, 0.493)');
 const currentColor = ref('rgba(255, 255, 255, 0.493)');
-const currentBoxShadow = ref('0 0 0px var(--white)');
+const currentBoxShadow = ref('none');
 
 const formData = reactive({
     secret: "",
@@ -103,7 +103,7 @@ watch(() => formData.lifetime, (newValue) =>{
     if (newValue){
         currentBorder.value = '1px solid #10b981';
         currentColor.value = '#10b981';
-        currentBoxShadow.value = '0 0 5px #fff';
+        currentBoxShadow.value = 'inset 0 0 0.35em 0 var(--accent), 0 0 0.35em 0 var(--accent)';
     }
 });
 

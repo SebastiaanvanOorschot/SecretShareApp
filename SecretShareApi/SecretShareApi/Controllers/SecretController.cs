@@ -21,7 +21,7 @@ namespace SecretShareApi.Controllers
         {
             var url = await _sharedSecretRepository.EncryptAndSaveSecret(dto);
 
-            return new JsonResult(url);
+            return new JsonResult(url); 
         }
 
         [HttpPost]

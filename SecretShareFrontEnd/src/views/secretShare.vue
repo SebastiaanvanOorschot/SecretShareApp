@@ -15,8 +15,8 @@
                     <i v-for="error in v$.passphrase.$errors" :key="error.$uid">required</i>
                 </div>
                 
-                <div class="column lifetimeContainer" data-text="Decide how long we should keep the secret in our database" :style="{ border: currentBorder, 'box-shadow': currentBoxShadow }">                    
-                    <label id="lifetime" :style="{ border: currentBorder, color: currentColor, 'box-shadow': currentBoxShadow }">Lifetime</label>
+                <div class="column lifetimeContainer" data-text="Decide how long we should keep the secret in our database">                    
+                    <label id="lifetime">Lifetime</label>
                     <div class="row radioGroup">
                         <div class="column radio">
                             <input type="radio" name="lifetime" v-model="formData.lifetime" value="3600" /> 
@@ -56,7 +56,7 @@
 
 <script setup lang="ts">
 
-import { reactive, ref, watch, computed } from 'vue';
+import { reactive, ref, computed } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import axios, { Axios, AxiosError } from 'axios';
@@ -70,9 +70,6 @@ const terminalVisible = ref(false);
 const relit = ref(false);
 /* forces a fresh NeonTerminal instance per run, so no state leaks between lives */
 const terminalRun = ref(0);
-const currentBorder = ref('1px solid rgba(255, 255, 255, 0.493)');
-const currentColor = ref('rgba(255, 255, 255, 0.493)');
-const currentBoxShadow = ref('none');
 
 const formData = reactive({
     secret: "",
@@ -98,14 +95,6 @@ const terminalLines = computed<TerminalLine[]>(() => [
     { text: `expires in ${lifetimeLabel.value}` },
     { text: "go tell someone else!" }
 ]);
-
-watch(() => formData.lifetime, (newValue) =>{
-    if (newValue){
-        currentBorder.value = '1px solid #10b981';
-        currentColor.value = '#10b981';
-        currentBoxShadow.value = 'inset 0 0 0.35em 0 var(--accent), 0 0 0.35em 0 var(--accent)';
-    }
-});
 
 /* phase 4 finished: the terminal is gone, but url/lines are kept so the lamp can bring it back */
 const onTerminalDead = () => {

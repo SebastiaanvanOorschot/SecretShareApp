@@ -10,11 +10,18 @@
   --accent: #10b981;
   --bg: #0a0e14;
   --outline: rgba(255, 255, 255, 0.493);
-  --outline-glow: rgb(255, 255, 255);
+  /* the white-hot core of the neon text glow: the first layer of the
+     anchor text-shadow signature */
+  --outline-glow: hsl(0 0% 100% / 0.3);
   --red: #ef4444;
   --text-strong: #f1f5f9;
   --text-faint: #334155;
   --border: #1e2937;
+  /* the content column. Viewport-relative on purpose: every ancestor is a
+     flex column with align-items:center, so none of them stretch, and a
+     percentage width would resolve against a box that is itself sized by
+     its content - which collapsed the column to ~265px on a phone. */
+  --col: 330px;
 }
 
 /* Site header (identiek aan HobbyHub-topbar) */
@@ -85,7 +92,7 @@ select {
 .helpTextContainer {
   position: relative;
   color: var(--accent);
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.7em var(--accent);
+  text-shadow: 0 0 0.125em var(--outline-glow), 0 0 0.7em var(--accent);
   text-align: left;
 }
 
@@ -96,7 +103,7 @@ select {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  width: 330px;
+  width: var(--col);
   gap: 30px;
 }
 .row {
@@ -104,7 +111,7 @@ select {
   justify-content: center;
   align-items: center;
   flex-direction: row;
-  width: 330px;
+  width: var(--col);
   gap: 30px;
 }
 
@@ -211,13 +218,13 @@ select {
   color: var(--accent);
   padding: 0.6em 1.2em;
   border: 0.15em solid var(--accent);
-  border-radius: 0.45em;
   background: none;
   perspective: 2em;
   font-size: 1.5rem;
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.75em;
+  white-space: nowrap;
   text-decoration: none;
   border-radius: 5px;
   transition: 0.3s;
@@ -225,18 +232,14 @@ select {
 
   -webkit-box-shadow: inset 0px 0px 0.5em 0px var(--accent),
     0px 0px 0.5em 0px var(--accent);
-  -moz-box-shadow: inset 0px 0px 0.5em 0px var(--accent),
-    0px 0px 0.5em 0px var(--accent);
   box-shadow: inset 0px 0px 0.5em 0px var(--accent),
     0px 0px 0.5em 0px var(--accent);
   animation: border-flicker 2s linear infinite;
 }
 .glowing-txt {
-  -webkit-text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3),
+  -webkit-text-shadow: 0 0 0.125em var(--outline-glow),
     0 0 0.45em var(--accent);
-  -moz-text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3),
-    0 0 0.45em var(--accent);
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--accent);
+  text-shadow: 0 0 0.125em var(--outline-glow), 0 0 0.45em var(--accent);
   animation: text-flicker 3s linear infinite;
 }
 .faulty-letter {
@@ -269,25 +272,25 @@ select {
   box-shadow: 0 0 2em 0.2em var(--accent);
   transition: opacity 100ms linear;
 }
-.help-btn:hover {
+.help-btn:is(:hover, :focus) {
   color: rgba(0, 0, 0, 0.8);
   text-shadow: none;
   animation: none;
   transform: translateY(-35px);
 }
-.help-btn:hover .glowing-txt {
+.help-btn:is(:hover, :focus) .glowing-txt {
   animation: none;
 }
-.help-btn:hover .faulty-letter {
+.help-btn:is(:hover, :focus) .faulty-letter {
   animation: none;
   text-shadow: none;
   opacity: 1;
 }
-.help-btn:hover:before {
+.help-btn:is(:hover, :focus):before {
   filter: blur(1.5em);
   opacity: 1;
 }
-.help-btn:hover:after {
+.help-btn:is(:hover, :focus):after {
   opacity: 1;
 }
 @keyframes faulty-flicker {
@@ -343,7 +346,7 @@ select {
 }
 .inputBox input {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border: 1px solid var(--outline);
   background: var(--bg);
   border-radius: 5px;
@@ -355,7 +358,7 @@ select {
 .inputBox span {
   position: absolute;
   left: 0;
-  padding: 10px;
+  padding: 12px;
   pointer-events: none;
   font-size: 1rem;
   color: var(--outline);
@@ -378,7 +381,7 @@ select {
   color: var(--accent);
   transform: translateX(10px) translateY(-22px);
   font-size: 0.65rem;
-  padding: 0 10px;
+  padding: 0 12px;
   background: var(--bg);
   border-left: 1px solid var(--accent);
   border-right: 1px solid var(--accent);
@@ -398,7 +401,7 @@ select {
   color: var(--accent);
   transform: translateX(10px) translateY(-22px);
   font-size: 0.65rem;
-  padding: 0 10px;
+  padding: 0 12px;
   background: var(--bg);
   border-left: 1px solid var(--accent);
   border-right: 1px solid var(--accent);
@@ -407,6 +410,9 @@ select {
 
 /* radio group */
 .lifetimeContainer {
+  /* so the badge below and the help text can anchor to this box on every
+     screen width; it used to be a containing block only while hovered */
+  position: relative;
   color: var(--outline);
   border: 1px solid var(--outline);
   border-radius: 5px;
@@ -427,17 +433,18 @@ select {
   background: var(--bg);
   border: 1px solid var(--outline);
   border-radius: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
+  padding: 0 4px;
   letter-spacing: 0.12em;
 }
 .lifetimeContainer i {
   position: absolute;
   color: var(--red);
-  /* nudged to line the right edge up with the .inputBox badges, which sit at
-     right:0 minus 10px; this one is centred, so the offset carries the width
-     of the word and had to follow the font change */
-  transform: translateX(108px) translateY(50px);
+  /* pinned to the bottom-right corner of the box. The old offsets were
+     measured from the static position, which sits in the MIDDLE of a flex
+     column, so they carried the height of the box as well as its width. */
+  right: 0;
+  top: 100%;
+  transform: translateX(-10px) translateY(-50%);
   font-size: 0.70rem;
   padding: 0 10px;
   background: var(--bg);
@@ -445,6 +452,19 @@ select {
   border-right: 1px solid var(--outline);
   letter-spacing: 0.2em;
 }
+/* filled state - the CSS counterpart of the inputs' :not(:placeholder-shown).
+   Used to be an inline :style binding carrying the accent colour as a
+   hardcoded JS string, which is why it could drift away from the token. */
+.lifetimeContainer:has(input[type="radio"]:checked),
+.lifetimeContainer:has(input[type="radio"]:checked) label {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0.35em 0 var(--accent),
+    0 0 0.35em 0 var(--accent);
+}
+.lifetimeContainer:has(input[type="radio"]:checked) label {
+  color: var(--accent);
+}
+
 .radioGroup {
   text-transform: uppercase;
   padding: 10px;
@@ -470,53 +490,60 @@ select {
 .passphraseContainer {
   transition: transform 0.3s;
 }
-.help-btn:hover ~ .passphraseContainer {
+.help-btn:is(:hover, :focus) ~ .passphraseContainer {
   transform: translateY(58px);
 }
 .retrievePassphraseContainer {
   transition: transform 0.3s;
 }
-.help-btn:hover ~ .retrievePassphraseContainer {
+.help-btn:is(:hover, :focus) ~ .retrievePassphraseContainer {
   transform: translateY(114px);
 }
 .lifetimeContainer {
   transition: transform 0.3s;
 }
-.help-btn:hover ~ .lifetimeContainer {
+.help-btn:is(:hover, :focus) ~ .lifetimeContainer {
   transform: translateY(116px);
 }
 .submitContainer {
+  /* the help text below it is absolute with top:100%, so this box has to be
+     its containing block. Without it the 100% resolved against the VIEWPORT,
+     which parked the text ~850px down and gave the page both scrollbars. */
+  position: relative;
   transition: transform 0.3s;
 }
-.help-btn:hover ~ .submitContainer {
+.help-btn:is(:hover, :focus) ~ .submitContainer {
   transform: translateY(150px);
 }
 .retrieveSubmitContainer {
+  position: relative;
   transition: transform 0.3s;
 }
-.help-btn:hover ~ .retrieveSubmitContainer {
+.help-btn:is(:hover, :focus) ~ .retrieveSubmitContainer {
   transform: translateY(125px);
-}
-.alertContainer {
-  transition: transform 0.3s;
-}
-.alertContainerRetrieve {
-  transition: transform 0.3s;
-}
-.help-btn:hover ~ .alertContainer {
-  transform: translateY(170px);
-}
-.help-btn:hover ~ .alertContainerRetrieve {
-  transform: translateY(190px);
 }
 
 /* help menu text */
+/* These hang below their own field, which means that at rest they lie over
+   the NEXT one - that is what made the radio buttons unclickable. They are
+   decoration, so they take no clicks; and they sit above the positioned
+   siblings that would otherwise paint over them. */
+.secretContainer::before,
+.passphraseContainer::before,
+.retrievePassphraseContainer::before,
+.lifetimeContainer::before,
+.submitContainer::before,
+.retrieveSubmitContainer::before,
+.retrieveInfoText::before {
+  pointer-events: none;
+  z-index: 1;
+}
 .secretContainer::before {
   position: absolute;
   top: calc(100% + 6px);
   content:attr(data-text);
   color: var(--accent);
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--accent);
+  text-shadow: 0 0 0.125em var(--outline-glow), 0 0 0.45em var(--accent);
   opacity: 0;
 }
 .passphraseContainer::before {
@@ -524,7 +551,7 @@ select {
   top: calc(100% + 6px);
   content:attr(data-text);
   color: var(--accent);
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--accent);
+  text-shadow: 0 0 0.125em var(--outline-glow), 0 0 0.45em var(--accent);
   opacity: 0;
 }
 .retrievePassphraseContainer::before {
@@ -533,7 +560,7 @@ select {
   left: 5px;
   content:attr(data-text);
   color: var(--accent);
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--accent);
+  text-shadow: 0 0 0.125em var(--outline-glow), 0 0 0.45em var(--accent);
   opacity: 0;
 }
 .lifetimeContainer::before {
@@ -541,7 +568,7 @@ select {
   top: calc(100% + 6px);
   content:attr(data-text);
   color: var(--accent);
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--accent);
+  text-shadow: 0 0 0.125em var(--outline-glow), 0 0 0.45em var(--accent);
   opacity: 0;
 }
 .submitContainer::before {
@@ -549,7 +576,7 @@ select {
   top: calc(100% + 6px);
   content:attr(data-text);
   color: var(--accent);
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--accent);
+  text-shadow: 0 0 0.125em var(--outline-glow), 0 0 0.45em var(--accent);
   opacity: 0;
 }
 .retrieveSubmitContainer::before {
@@ -557,7 +584,7 @@ select {
   top: calc(100% + 6px);
   content:attr(data-text);
   color: var(--accent);
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--accent);
+  text-shadow: 0 0 0.125em var(--outline-glow), 0 0 0.45em var(--accent);
   opacity: 0;
 }
 .retrieveInfoText::before {
@@ -565,81 +592,31 @@ select {
   content:attr(data-text);
   top: -10px;
   color: var(--accent);
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em var(--accent);
+  text-shadow: 0 0 0.125em var(--outline-glow), 0 0 0.45em var(--accent);
   opacity: 0;
 }
-.help-btn:hover ~ .secretContainer::before {
+.help-btn:is(:hover, :focus) ~ .secretContainer::before {
   opacity: 1;   
 }
-.help-btn:hover ~ .passphraseContainer::before {
+.help-btn:is(:hover, :focus) ~ .passphraseContainer::before {
   opacity: 1;   
 }
-.help-btn:hover ~ .retrievePassphraseContainer::before {
+.help-btn:is(:hover, :focus) ~ .retrievePassphraseContainer::before {
   opacity: 1;   
 }
-.help-btn:hover ~ .lifetimeContainer::before {
+.help-btn:is(:hover, :focus) ~ .lifetimeContainer::before {
   opacity: 1;   
 }
-.help-btn:hover ~ .submitContainer::before {
+.help-btn:is(:hover, :focus) ~ .submitContainer::before {
   opacity: 1;   
 }
-.help-btn:hover ~ .retrieveSubmitContainer::before {
+.help-btn:is(:hover, :focus) ~ .retrieveSubmitContainer::before {
   opacity: 1;   
 }
-.help-btn:hover ~ .retrieveInfoText::before {
+.help-btn:is(:hover, :focus) ~ .retrieveInfoText::before {
   opacity: 1;   
 }
 
-
-/* alerts */
-.alertContainer {
-  font-size: 1.7rem;
-  color: var(--accent);
-  text-shadow: 0 0 10px var(--accent),
-  0 0 30px var(--accent),
-  0 0 80px var(--accent);
-  animation: flicker 3.5s linear infinite;
-  animation-delay: 3s;
-  text-align: center;
-}
-.alertContainerRetrieve {
-  font-size: 1.7rem;
-  color: var(--accent);
-  text-shadow: 0 0 10px var(--accent),
-  0 0 30px var(--accent),
-  0 0 80px var(--accent);
-  animation: flicker 3.5s linear infinite;
-  animation-delay: 3s;
-  text-align: center;
-}
-.flicker {    
-  animation: border-flicker 2s linear infinite;
-  animation-delay: 4.5s;
-}
-.copied {  
-  opacity: 0;
-  animation: fade-in 4s linear;
-  animation-play-state: paused;  
-}
-.noTell {
-  opacity: 0;
-  animation: fade-in 3s linear;
-  animation-delay: 4.5s;
-  animation-play-state: paused;  
-}
-.fadeIn {
-  opacity: 0;
-  animation: fade-in 4s linear forwards;
-  animation-play-state: paused;  
-}
-@keyframes fade-in {
-  0% { 
-    opacity: 0;
-  }
-  100% { 
-    opacity: 1;
-  }  
-}  
 
 
 /* On smaller screens, where width is less than 450px */
@@ -648,30 +625,44 @@ select {
     font-size: calc(97%);
   }
 
-  body {  
-    overflow: scroll;
+  :root {
+    --col: min(330px, calc(100vw - 20px));
+  }
+
+  body {
+    /* was overflow: scroll, which forces both bars to sit there permanently */
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  /* the header lines up with the content instead of running edge to edge */
+  .topbar {
+    width: var(--col);
+  }
+
+  main {
+    /* Top-aligned, so the room the help menu claims grows downwards only.
+       Centred, the column grew in BOTH directions and slid the lamp out from
+       under the cursor, which closed the menu again on the first mouse move.
+       The padding covers the lamp's own translateY(-30px) so it cannot ride
+       up over the header. */
+    align-items: flex-start;
+    padding-top: 64px;
   }
 
   .column {
-    width: calc(97%);
     gap: 20px;
   }
   .row {
-    width: calc(97%);
     gap: 20px;
-  } 
+  }
 
-  .help-btn:hover {
+  .help-btn:is(:hover, :focus) {
     transform: translateY(-20px);
   }
 
-  .helpTextContainer {
-    width: calc(97%);
-  }
-
   .submitButton {
-    width: calc(100%);
-    min-width: calc(97%);
+    width: 100%;
   }
 
   .inputBox i {
@@ -693,7 +684,6 @@ select {
   .lifetimeContainer i {
     font-size: 0.60rem;
     font-weight: 800;
-    transform: translateX(103px) translateY(49px);
   }
 
   /* help menu text */
@@ -705,34 +695,32 @@ select {
   }
 
   /* help menu movements */
-  .help-btn:hover ~ .passphraseContainer {
+  /* The panels move with transform and the help text is absolute, so the
+     expansion costs no layout height and used to run straight over the
+     footer. :has(> .help-btn) picks out the one column that owns the lamp. */
+  .column:has(> .help-btn) {
+    transition: padding-bottom 0.3s;
+  }
+  .column:has(> .help-btn:is(:hover, :focus)) {
+    padding-bottom: 260px;
+  }
+
+  .help-btn:is(:hover, :focus) ~ .passphraseContainer {
     transform: translateY(65px);
   }
-  .help-btn:hover ~ .retrievePassphraseContainer {
+  .help-btn:is(:hover, :focus) ~ .retrievePassphraseContainer {
     transform: translateY(128px);
   }
-  .help-btn:hover ~ .lifetimeContainer {
+  .help-btn:is(:hover, :focus) ~ .lifetimeContainer {
     transform: translateY(130px);
   }
-  .help-btn:hover ~ .submitContainer {
+  .help-btn:is(:hover, :focus) ~ .submitContainer {
     transform: translateY(172px);
   }
-  .help-btn:hover ~ .retrieveSubmitContainer {
+  .help-btn:is(:hover, :focus) ~ .retrieveSubmitContainer {
     transform: translateY(147px);
   }
-  .help-btn:hover ~ .alertContainer {
-    transform: translateY(140px);
-  }
-  .help-btn:hover ~ .alertContainerRetrieve {
-    transform: translateY(120px);
-  }
 
-
-  @media screen and (max-width: 302px) {
-    .lifetimeContainer i {
-      transform: translateX(77px) translateY(49px);
-    }
-  }
 } 
 
 /* ============================================================
@@ -744,7 +732,7 @@ select {
 .terminalContainer {
   transition: transform 0.3s;
 }
-.help-btn:hover ~ .terminalContainer {
+.help-btn:is(:hover, :focus) ~ .terminalContainer {
   transform: translateY(208px);
 }
 
@@ -1208,7 +1196,7 @@ select {
 }
 
 @media screen and (max-width: 600px) {
-  .help-btn:hover ~ .terminalContainer {
+  .help-btn:is(:hover, :focus) ~ .terminalContainer {
     transform: translateY(237px);
   }
   .neon-terminal {
@@ -1500,12 +1488,12 @@ select {
 .terminalContainerRetrieve {
   transition: transform 0.3s;
 }
-.help-btn:hover ~ .terminalContainerRetrieve {
+.help-btn:is(:hover, :focus) ~ .terminalContainerRetrieve {
   transform: translateY(190px);
 }
 
 @media screen and (max-width: 600px) {
-  .help-btn:hover ~ .terminalContainerRetrieve {
+  .help-btn:is(:hover, :focus) ~ .terminalContainerRetrieve {
     transform: translateY(212px);
   }
 }

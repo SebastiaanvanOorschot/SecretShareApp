@@ -1,7 +1,7 @@
 <template>
     <form @submit.prevent="submitForm">
             <div class="column">
-                <button class="row help-btn" type="button"><span class='glowing-txt'>H<span class='faulty-letter'>E</span>LP ME</span></button>
+                <button class="row help-btn" type="button" @mouseenter="relight" @focus="relight"><span class='glowing-txt'>H<span class='faulty-letter'>E</span>LP ME</span></button>
 
                 <div  class="row inputBox secretContainer" data-text="Fill in a secret, don't worry, we will encrypt it and store it in our database">
                     <input type="text" name="secret" class="inputBox" v-model="formData.secret" placeholder="" onfocus="placeholder=''">
@@ -40,9 +40,15 @@
                     </a>                 
                 </div>
                 
-                <div class="column alertContainer" ref="alertContainer" :style="{ opacity: 0 }">
-                    <p ref="alertMessage" class="flicker">CHECK YOUR C<span class='faulty-letter'>L</span>IPBOARD</p>
-                </div>   
+                <NeonTerminal
+                    v-if="terminalVisible"
+                    :key="terminalRun"
+                    class="terminalContainer"
+                    :lines="terminalLines"
+                    :copy-text="url"
+                    :instant="relit"
+                    @dead="onTerminalDead"
+                />
             </div>
             
     </form>
@@ -54,19 +60,44 @@ import { reactive, ref, watch, computed } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import axios, { Axios, AxiosError } from 'axios';
+import NeonTerminal from '../components/NeonTerminal.vue';
+import type { TerminalLine } from '../composables/useTypewriter';
 
 const url = ref("");
-const alertContainer = ref();
+const terminalVisible = ref(false);
+/* true once the terminal has died at least once: re-lighting opens it straight
+   in the finished, living state instead of typing everything out again */
+const relit = ref(false);
+/* forces a fresh NeonTerminal instance per run, so no state leaks between lives */
+const terminalRun = ref(0);
 const currentBorder = ref('1px solid rgba(255, 255, 255, 0.493)');
 const currentColor = ref('rgba(255, 255, 255, 0.493)');
 const currentBoxShadow = ref('0 0 0px var(--white)');
-const alertMessage = ref();
 
 const formData = reactive({
     secret: "",
     lifetime: "",
     passphrase: ""
 });
+
+/* lifetime is stored as seconds; the terminal shows the human label the user picked */
+const lifetimeLabels: Record<string, string> = {
+    "3600": "1 hour",
+    "86400": "1 day",
+    "259200": "3 days"
+};
+
+const lifetimeLabel = computed(() => lifetimeLabels[formData.lifetime] ?? "a while");
+
+/* terminal output, kept as data so extra lines are a one-liner to add */
+const terminalLines = computed<TerminalLine[]>(() => [
+    { text: "encrypting secret..." },
+    { text: "secret secured" },
+    { text: "link copied to clipboard", flicker: true },
+    { text: url.value, href: url.value },
+    { text: `expires in ${lifetimeLabel.value}` },
+    { text: "go tell someone else!" }
+]);
 
 watch(() => formData.lifetime, (newValue) =>{
     if (newValue){
@@ -75,6 +106,20 @@ watch(() => formData.lifetime, (newValue) =>{
         currentBoxShadow.value = '0 0 5px #fff';
     }
 });
+
+/* phase 4 finished: the terminal is gone, but url/lines are kept so the lamp can bring it back */
+const onTerminalDead = () => {
+    terminalVisible.value = false;
+    relit.value = true;
+};
+
+/* re-light: hovering (or focusing) the lamp powers a dead terminal back up,
+   straight into the finished + living state */
+const relight = () => {
+    if (!url.value || terminalVisible.value) return;
+    terminalRun.value++;
+    terminalVisible.value = true;
+};
 
 const rules = {
     secret: { required },
@@ -91,8 +136,9 @@ const submitForm = async () => {
             .then(returnData => {
                 url.value = returnData.data;
                 navigator.clipboard.writeText(returnData.data);
-                alertContainer.value.style.opacity = 1;
-                alertMessage.value.style.animationPlayState = "running";
+                relit.value = false;
+                terminalRun.value++;
+                terminalVisible.value = true;
             })
             .catch((e: AxiosError) => {
                 alert(e.message)

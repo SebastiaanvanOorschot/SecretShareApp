@@ -1,9 +1,9 @@
 <template>
     <form @submit.prevent="submitForm">
             <div class="column">
-                <input name="urlExtension" v-model="formData.urlExtension" type="hidden" />                
+                <input name="urlExtension" v-model="formData.urlExtension" type="hidden" />
 
-                <button class="row help-btn" type="button"><span class='glowing-txt'>H<span class='faulty-letter'>E</span>LP ME</span></button>
+                <button class="row help-btn" type="button" @mouseenter="relight" @focus="relight"><span class='glowing-txt'>H<span class='faulty-letter'>E</span>LP ME</span></button>
 
                 <div class="row inputBox retrieveInfoText" data-text="Somebody wants to let you in on a secret.. They've probably given you a passphrase. Go and check it out. Be sure to store it safely though. Once retrieved it will be deleted permanently">
                 </div>
@@ -13,41 +13,67 @@
                     <span>Passphrase</span>
                     <i v-for="error in v$.passphrase.$errors" :key="error.$uid">required</i>
                 </div>
-                
-                <div class="column retrieveSubmitContainer" data-text="Click this button to submit your passphrase and retrieve the secret if it was correct.">                    
+
+                <div class="column retrieveSubmitContainer" data-text="Click this button to submit your passphrase and retrieve the secret if it was correct.">
                     <a href="#" type="submit" v-on:click="submitForm" class="row submitButton" style="--clr:var(--accent)"><span>come a little closer..</span><i></i></a>
-                </div>  
-                <div class="column alertContainerRetrieve">
-                    <div ref="fadeIn" class="fadeIn">
-                        <p ref="revealed" class="flicker">{{ secret }}</p>
-                    </div>
-                    <p ref="copied" class="copied">(COPIED TO CLIPBOARD)</p>
-                    <p ref="noTell" class="noTell">DON'T TELL ANYONE</p>                
                 </div>
+
+                <NeonTerminal
+                    v-if="secret"
+                    ref="terminal"
+                    class="terminalContainerRetrieve"
+                    :lines="terminalLines"
+                    :copy-text="secret"
+                    death="dim"
+                    :auto-death="AUTO_DIM_DELAY"
+                />
             </div>
     </form>
 </template>
- 
+
 <script setup lang="ts">
-import { reactive, ref } from 'vue'; 
+import { computed, ref, reactive } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
-import { required } from '@vuelidate/validators';     
+import { required } from '@vuelidate/validators';
 import axios, { Axios, AxiosError } from 'axios';
 import { useRoute } from 'vue-router';
+import NeonTerminal from '../components/NeonTerminal.vue';
+import type { TerminalLine } from '../composables/useTypewriter';
 
 const route = useRoute();
+
+/* The secret lives here and nowhere else: plain in-memory component state.
+   No localStorage, no sessionStorage, no cookies - it is gone on refresh,
+   which matches the server having destroyed it on retrieval. */
 const secret = ref("");
-const revealed = ref();
-const noTell = ref();
-const copied = ref();
-const fadeIn = ref();
+const terminal = ref();
+
+/* ms the fully revealed secret stays at full strength before it dims by itself */
+const AUTO_DIM_DELAY = 5000;
 
 const formData = reactive({
     passphrase: "",
     urlExtension: route.params.hash
 });
 
-const rules = {     
+/* terminal output; the secret line decrypt-scrambles and is the one that
+   stays behind (dimmed) when the rest of the terminal goes out */
+const terminalLines = computed<TerminalLine[]>(() => [
+    { text: "verifying passphrase..." },
+    { text: "decrypting..." },
+    { text: "secret retrieved" },
+    { text: secret.value, reveal: 'scramble', keep: true },
+    { text: "this secret has now been destroyed", flicker: true }
+]);
+
+/* re-light: hovering (or focusing) the lamp wakes a dimmed terminal back up.
+   The terminal is still mounted here, so it re-lights itself instead of
+   being re-mounted the way the share page does it. */
+const relight = () => {
+    terminal.value?.relight();
+};
+
+const rules = {
     passphrase: { required }
 };
 
@@ -59,18 +85,13 @@ const submitForm = async () => {
         await axios.post(import.meta.env.VITE_SECRETSHAREAPI_URL + '/api/secret/retrieve', formData)
             .then(returnData => {
                 secret.value = returnData.data;
-                fadeIn.value.style.animationPlayState = "running";
-                revealed.value.style.animationPlayState = "running";
-                copied.value.style.animationPlayState = "running";
-                noTell.value.style.animationPlayState = "running";
-                navigator.clipboard.writeText(returnData.data);
             })
             .catch((e: AxiosError) => {
                 alert(e.message)
             });
-    }    
+    }
 };
-    
+
 </script>
 
 <style>

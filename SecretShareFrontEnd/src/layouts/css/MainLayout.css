@@ -782,6 +782,185 @@ body {
   font-family: 'Space Mono', monospace;
 }
 
+/* Power-on: a fluorescent tube that does not want to start.
+   Built the way the HELP lamp is built, and for the same reason. The lamp
+   never reads as "animated" because it is not one animation: the button, the
+   text and the faulty letter each run their own keyframe at their own duration
+   (2s / 3s / 2s), so the eye sees the SUM of three timelines sliding past each
+   other. One perfectly authored curve always reads as authored. Three
+   unrelated ones read as a broken lamp.
+
+   So the power-on is three layers on three properties and three durations that
+   share no beat:
+
+     .neon-terminal__frame          opacity       3.6s   the current itself
+     .neon-terminal__frame::before  box-shadow    3.4s   the gas bloom
+     .neon-terminal__frame::after   border-color  2.9s   the white-hot electrodes
+
+   Each layer borrows one of the lamp's keyframe SHAPES - border-flicker's hard
+   snaps, text-flicker's ragged mid-section, faulty-flicker's low/high stutter -
+   so the terminal and the lamp are family. Because the durations differ, the
+   same stop percentage lands at a different millisecond on every layer (70% is
+   2520ms on the current, 2380ms on the bloom, 2030ms on the electrodes), and
+   the pseudos are children of the frame, so their opacity is MULTIPLIED by it.
+   The result is a product of three unrelated curves - no single timeline you
+   can read back out of it. Keep all three linear: the rhythm has to come from
+   the spacing of the stops, not from an easing.
+
+   Handover: both pseudo layers taper to nothing at their own 100% (3.4s / 2.9s,
+   both before the current settles at 3.6s), so when the terminal goes alive
+   there is nothing left to switch off and no step in brightness at the seam.
+   Stop percentages below are of each layer's OWN duration. */
+
+/* layer 1 - the current. Coarse narrative only: cold, a weak attempt that
+   drops out, a stutter, a dead beat, then it strikes. The micro-texture is
+   deliberately NOT here; layers 2 and 3 supply it inside these on-windows.
+   3.6s, so 1% = 36ms. */
+@keyframes terminal-power-current {
+  /* cold and dead for a beat (0 - 180ms) */
+  0%, 5% {
+    opacity: 0;
+  }
+
+  /* attempt 1 - a lazy glow creeps up over half a second (180 - 756ms) */
+  14% {
+    opacity: 0.16;
+  }
+  21% {
+    opacity: 0.48;
+  }
+
+  /* ...and drops out in a single frame (756 - 828ms) */
+  22% {
+    opacity: 0.04;
+  }
+  23%, 31% {
+    opacity: 0;
+  }
+
+  /* attempt 2 - it catches, badly (1152 - 1404ms) */
+  33% {
+    opacity: 0.85;
+  }
+  35% {
+    opacity: 0.2;
+  }
+  37% {
+    opacity: 0.7;
+  }
+
+  /* the long empty beat, 470ms of nothing (1404 - 1872ms) */
+  39%, 52% {
+    opacity: 0;
+  }
+
+  /* last try - the current holds this time (1872 - 2520ms) */
+  60% {
+    opacity: 0.34;
+  }
+  70% {
+    opacity: 0.78;
+  }
+
+  /* one snap out to fake you out, then it strikes (2592 - 2808ms) */
+  72% {
+    opacity: 0.1;
+  }
+  74% {
+    opacity: 1;
+  }
+  76% {
+    opacity: 0.42;
+  }
+  78% {
+    opacity: 1;
+  }
+
+  /* the lamp's way of finishing: a long lazy drift, not a flat hold */
+  88% {
+    opacity: 0.94;
+  }
+  94%, 100% {
+    opacity: 1;
+  }
+}
+
+/* layer 2 - the gas bloom. The lamp's text-flicker stop pattern (0/8/12 low,
+   2/9/20/30 high, 25 dip, 70 mid, 72 dip, 77 high) driving box-shadow blur and
+   spread instead of opacity: the halo actually swells and collapses, which is
+   the one thing transparency cannot fake. Ends at zero bloom so the idle glow
+   is exactly the frame's own static shadow. 3.4s, so 1% = 34ms. */
+@keyframes terminal-power-bloom {
+  0%, 8%, 12% {
+    opacity: 0.1;
+    box-shadow: 0 0 0.1em 0 var(--accent);
+  }
+  2%, 9%, 20% {
+    opacity: 0.9;
+    box-shadow: 0 0 0.85em 0.06em var(--accent);
+  }
+  25% {
+    opacity: 0.3;
+    box-shadow: 0 0 0.22em 0 var(--accent);
+  }
+  30% {
+    opacity: 1;
+    box-shadow: 0 0 1.1em 0.1em var(--accent);
+  }
+  70% {
+    opacity: 0.7;
+    box-shadow: 0 0 0.6em 0.03em var(--accent);
+  }
+  72% {
+    opacity: 0.2;
+    box-shadow: 0 0 0.18em 0 var(--accent);
+  }
+  77% {
+    opacity: 0.85;
+    box-shadow: 0 0 0.95em 0.07em var(--accent);
+  }
+  100% {
+    opacity: 0;
+    box-shadow: 0 0 0.5em 0 var(--accent);
+  }
+}
+
+/* layer 3 - the electrodes. The lamp's faulty-flicker stop pattern
+   (0/2/21 low, 4/19/80 mid, 23/87 high, 83 dip) on border-color: a white-hot
+   hairline over the accent border, the bit that lights before the tube does.
+   Fades to fully transparent, so nothing of it survives into idle.
+   2.9s, so 1% = 29ms. */
+@keyframes terminal-power-electrode {
+  0%, 2%, 21% {
+    opacity: 0.2;
+    border-color: hsl(0 0% 100% / 0);
+  }
+  4%, 19% {
+    opacity: 0.6;
+    border-color: hsl(0 0% 100% / 0.3);
+  }
+  23% {
+    opacity: 1;
+    border-color: hsl(0 0% 100% / 0.85);
+  }
+  80% {
+    opacity: 0.6;
+    border-color: hsl(0 0% 100% / 0.45);
+  }
+  83% {
+    opacity: 0.25;
+    border-color: hsl(0 0% 100% / 0.1);
+  }
+  87% {
+    opacity: 1;
+    border-color: hsl(0 0% 100% / 0.7);
+  }
+  100% {
+    opacity: 0;
+    border-color: hsl(0 0% 100% / 0);
+  }
+}
+
 /* the frame is its own layer so the border can flicker without the text flickering along.
    phase 3 only has to swap this single run for an infinite one. */
 .neon-terminal__frame {
@@ -794,9 +973,30 @@ body {
     0px 0px 0.5em 0px var(--accent);
   box-shadow: inset 0px 0px 0.5em 0px var(--accent),
     0px 0px 0.5em 0px var(--accent);
-  animation: border-flicker 2s linear 1 both;
+  animation: terminal-power-current 3.6s linear 1 both;
 }
-.neon-terminal--still .neon-terminal__frame {
+/* both extra layers sit on the frame's border box (inset -1px cancels its
+   1px border) and default to invisible, so with animation: none they simply
+   are not there and the idle / dying / reduced-motion states stay untouched. */
+.neon-terminal__frame::before,
+.neon-terminal__frame::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 5px;
+  pointer-events: none;
+  opacity: 0;
+}
+.neon-terminal__frame::before {
+  animation: terminal-power-bloom 3.4s linear 1 both;
+}
+.neon-terminal__frame::after {
+  border: 1px solid transparent;
+  animation: terminal-power-electrode 2.9s linear 1 both;
+}
+.neon-terminal--still .neon-terminal__frame,
+.neon-terminal--still .neon-terminal__frame::before,
+.neon-terminal--still .neon-terminal__frame::after {
   animation: none;
 }
 
@@ -920,7 +1120,9 @@ body {
   }
 }
 .neon-terminal--alive .neon-terminal__frame {
-  animation: border-flicker-idle 5s linear infinite;
+  /* the negative delay starts the loop past its opening dip, so the handover
+     from the power-on (which ends at full strength) has no step in brightness */
+  animation: border-flicker-idle 5s linear -0.5s infinite;
 }
 
 /* the steady majority: one slow shared breath, nothing jumpy */
@@ -1185,6 +1387,8 @@ body {
    simply removes the terminal instead of animating it out.
    ============================================================ */
 .neon-terminal--still .neon-terminal__frame,
+.neon-terminal--still .neon-terminal__frame::before,
+.neon-terminal--still .neon-terminal__frame::after,
 .neon-terminal--still .neon-terminal__body,
 .neon-terminal--still .neon-terminal__line,
 .neon-terminal--still .neon-terminal__line--keep,
@@ -1199,6 +1403,8 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .neon-terminal,
   .neon-terminal__frame,
+  .neon-terminal__frame::before,
+  .neon-terminal__frame::after,
   .neon-terminal__body,
   .neon-terminal__line,
   .neon-terminal--dormant .neon-terminal__line--keep,

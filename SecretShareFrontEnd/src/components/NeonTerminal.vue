@@ -10,7 +10,7 @@
         }"
     >
         <!-- separate frame layer so the border can flicker without dragging the text along -->
-        <span class="neon-terminal__frame" aria-hidden="true"></span>
+        <span ref="frame" class="neon-terminal__frame" aria-hidden="true"></span>
 
         <div class="neon-terminal__bar">
             <button
@@ -19,7 +19,7 @@
                 class="neon-terminal__btn neon-terminal__btn--skip"
                 :class="{ 'neon-terminal__btn--faulty': isAlive }"
                 :disabled="finished"
-                @click="skip"
+                @click="skipIntro"
             >skip</button>
             <button
                 type="button"
@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useTypewriter, type TerminalLine } from '../composables/useTypewriter'
 
 const props = withDefaults(defineProps<{
@@ -89,7 +89,7 @@ const emit = defineEmits<{
 }>()
 
 /**
- * typing  -> phase 1+2: frame powers on, output reveals itself
+ * typing  -> phase 1+2: frame powers on, THEN the output reveals itself
  * alive   -> phase 3: steady glow, with two off-beat "broken tubes"
  * dying   -> phase 4: elements go out in an uneven order
  * dead    -> collapse death only: gone, the parent hides it and can re-mount it
@@ -127,10 +127,13 @@ const {
     lines: typedLines,
     finished,
     cursorIndex,
-    skip,
     start,
     stop
 } = useTypewriter({ instant: prefersReducedMotion })
+
+/* the frame element runs the power-on, so it is the one thing that knows when
+   the tube is actually lit; the typewriter waits for it */
+const frame = ref<HTMLElement | null>(null)
 
 /* every timeout this component owns lives here, so one call cleans them all up */
 let timers: number[] = []
@@ -139,9 +142,67 @@ const later = (fn: () => void, delay: number) => {
     timers.push(window.setTimeout(fn, delay))
 }
 
-const clearTimers = () => {
+/* --- waiting for the power-on -------------------------------------------
+   Phase 1 lives entirely in CSS, so nothing here hardcodes its length: we
+   listen for the animationend of the layer that IS the power-on, and the
+   safety timer reads its duration off the element, which means the stylesheet
+   stays the single source of truth and JS cannot drift away from it. */
+const POWER_ON_ANIMATION = 'terminal-power-current'
+const POWER_ON_FALLBACK = 2400 // only used if there is no element to ask
+const POWER_ON_GRACE = 250     // the net fires just after the animation should have
+
+/** true once this instance is fully lit, so a later run never waits again */
+let poweredOn = false
+let powerOnEl: HTMLElement | null = null
+let powerOnHandler: ((event: AnimationEvent) => void) | null = null
+/** bumped on every cancel, so work queued across a tick can tell it is stale */
+let runToken = 0
+
+const dropPowerOnWait = () => {
+    if (powerOnEl && powerOnHandler) {
+        powerOnEl.removeEventListener('animationend', powerOnHandler)
+    }
+    powerOnEl = null
+    powerOnHandler = null
+}
+
+const clearPending = () => {
     timers.forEach((id) => window.clearTimeout(id))
     timers = []
+    dropPowerOnWait()
+    runToken++
+}
+
+const powerOnMs = (el: HTMLElement) => {
+    const raw = window.getComputedStyle(el).animationDuration.split(',')[0].trim()
+    const value = parseFloat(raw)
+    if (Number.isNaN(value)) return POWER_ON_FALLBACK
+    return raw.endsWith('ms') ? value : value * 1000
+}
+
+/** run `then` the moment the tube is fully on - never while it is still striking */
+const afterPowerOn = (then: () => void) => {
+    const el = frame.value
+    if (poweredOn || !el) {
+        poweredOn = true
+        then()
+        return
+    }
+
+    const fire = () => {
+        if (!powerOnHandler) return // the event already won, or we were cancelled
+        dropPowerOnWait()
+        poweredOn = true
+        then()
+    }
+
+    powerOnEl = el
+    powerOnHandler = (event: AnimationEvent) => {
+        // the bloom and electrode layers bubble their own end up to the frame
+        if (event.animationName === POWER_ON_ANIMATION) fire()
+    }
+    el.addEventListener('animationend', powerOnHandler)
+    later(fire, powerOnMs(el) + POWER_ON_GRACE)
 }
 
 const copied = ref(false)
@@ -154,12 +215,23 @@ const settle = () => {
     if (phase.value === 'dead') emit('dead')
 }
 
+/**
+ * Straight to the finished output, from wherever the intro is. It cancels the
+ * pending "wait for the power-on" as well, so skipping while the tube is still
+ * striking lands on the end state instead of typing everything out afterwards;
+ * the terminal goes alive off the back of `finished`, which snaps the frame to
+ * fully lit and drops the half-finished power-on layers.
+ */
+const skipIntro = () => {
+    clearPending()
+    if (!finished.value) start(props.lines, true)
+}
+
 /** shared by the copy button and the auto-death timer */
 const die = () => {
     if (isGone()) return
 
-    clearTimers()
-    skip() // always die from the complete picture, never mid-sentence
+    skipIntro() // always die from the complete picture, never mid-sentence
 
     if (prefersReducedMotion) {
         settle() // no dying animation, just the end state
@@ -187,7 +259,12 @@ const copyLink = async () => {
     }
 
     emit('copy')
-    clearTimers() // a manual copy cancels any pending auto-death
+    /* a manual copy cancels any pending auto-death - and the wait for the
+       power-on with it, so if the tube was still striking, show what is being
+       copied now instead of dying with an empty box */
+    const stillDark = !poweredOn
+    clearPending()
+    if (stillDark) skipIntro()
     copied.value = true
     later(die, COPY_BEAT)
 }
@@ -198,7 +275,7 @@ const copyLink = async () => {
  */
 const relight = () => {
     if (phase.value !== 'dormant') return
-    clearTimers()
+    clearPending()
     copied.value = false
     phase.value = 'alive'
     scheduleAutoDeath()
@@ -216,15 +293,30 @@ watch(finished, (value) => {
 })
 
 watch(() => props.lines, (value) => {
-    clearTimers()
+    clearPending()
     copied.value = false
     phase.value = 'typing'
-    start(value, prefersReducedMotion || props.instant)
+
+    /* re-light and reduced motion both open on the finished picture: there is
+       no power-on to sit through, so nothing is gated */
+    if (prefersReducedMotion || props.instant) {
+        poweredOn = true
+        start(value, true)
+        return
+    }
+
+    /* the body stays empty until the tube is lit - text on a struggling tube
+       reads wrong. The frame only exists after this render, hence nextTick. */
+    const token = runToken
+    nextTick(() => {
+        if (token !== runToken) return // a newer run took over in the meantime
+        afterPowerOn(() => start(value, false))
+    })
 }, { immediate: true })
 
 onBeforeUnmount(() => {
     stop()
-    clearTimers()
+    clearPending()
 })
 </script>
 

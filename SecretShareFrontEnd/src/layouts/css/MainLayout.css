@@ -790,39 +790,46 @@ body {
    other. One perfectly authored curve always reads as authored. Three
    unrelated ones read as a broken lamp.
 
-   So the power-on is three layers on three properties and three durations that
-   share no beat:
+   So the power-on is five layers on five durations that share no beat:
 
-     .neon-terminal__frame          opacity       3.6s   the current itself
-     .neon-terminal__frame::before  box-shadow    3.4s   the gas bloom
-     .neon-terminal__frame::after   border-color  2.9s   the white-hot electrodes
+     .neon-terminal__frame          opacity       2.4s   the current itself
+     .neon-terminal__frame::before  box-shadow    2.27s  the gas bloom
+     .neon-terminal__frame::after   border-color  1.93s  the white-hot electrodes
+     .neon-terminal__btn--copy      opacity       2.15s  small tube, corner right
+     .neon-terminal__btn--skip      opacity       1.7s   small tube, corner right
 
    Each layer borrows one of the lamp's keyframe SHAPES - border-flicker's hard
    snaps, text-flicker's ragged mid-section, faulty-flicker's low/high stutter -
    so the terminal and the lamp are family. Because the durations differ, the
    same stop percentage lands at a different millisecond on every layer (70% is
-   2520ms on the current, 2380ms on the bloom, 2030ms on the electrodes), and
+   1680ms on the current, 1589ms on the bloom, 1351ms on the electrodes), and
    the pseudos are children of the frame, so their opacity is MULTIPLIED by it.
-   The result is a product of three unrelated curves - no single timeline you
-   can read back out of it. Keep all three linear: the rhythm has to come from
-   the spacing of the stops, not from an easing.
+   The frame is therefore a product of three unrelated curves, the corner adds
+   two more that answer to nobody - no single timeline you can read back out of
+   it. Keep all five linear: the rhythm has to come from the spacing of the
+   stops, not from an easing.
 
-   Handover: both pseudo layers taper to nothing at their own 100% (3.4s / 2.9s,
-   both before the current settles at 3.6s), so when the terminal goes alive
+   Handover: both pseudo layers taper to nothing at their own 100% (2.27s / 1.93s,
+   both before the current settles at 2.4s), so when the terminal goes alive
    there is nothing left to switch off and no step in brightness at the seam.
+   The two buttons settle at 0.55 - their own resting opacity - and run with NO
+   fill mode, so the moment they are done the plain :hover / :disabled / idle
+   rules own the property again. They are also the two shortest layers, so by
+   the time the current strikes at 2.4s the whole sign is standing still and the
+   typewriter can start on a tube that is genuinely on.
    Stop percentages below are of each layer's OWN duration. */
 
 /* layer 1 - the current. Coarse narrative only: cold, a weak attempt that
    drops out, a stutter, a dead beat, then it strikes. The micro-texture is
    deliberately NOT here; layers 2 and 3 supply it inside these on-windows.
-   3.6s, so 1% = 36ms. */
+   2.4s, so 1% = 24ms. */
 @keyframes terminal-power-current {
-  /* cold and dead for a beat (0 - 180ms) */
+  /* cold and dead for a beat (0 - 120ms) */
   0%, 5% {
     opacity: 0;
   }
 
-  /* attempt 1 - a lazy glow creeps up over half a second (180 - 756ms) */
+  /* attempt 1 - a lazy glow creeps up over a third of a second (120 - 504ms) */
   14% {
     opacity: 0.16;
   }
@@ -830,7 +837,7 @@ body {
     opacity: 0.48;
   }
 
-  /* ...and drops out in a single frame (756 - 828ms) */
+  /* ...and drops out in a single frame (504 - 552ms) */
   22% {
     opacity: 0.04;
   }
@@ -838,7 +845,7 @@ body {
     opacity: 0;
   }
 
-  /* attempt 2 - it catches, badly (1152 - 1404ms) */
+  /* attempt 2 - it catches, badly (768 - 936ms) */
   33% {
     opacity: 0.85;
   }
@@ -849,12 +856,12 @@ body {
     opacity: 0.7;
   }
 
-  /* the long empty beat, 470ms of nothing (1404 - 1872ms) */
+  /* the long empty beat, 312ms of nothing (936 - 1248ms) */
   39%, 52% {
     opacity: 0;
   }
 
-  /* last try - the current holds this time (1872 - 2520ms) */
+  /* last try - the current holds this time (1248 - 1680ms) */
   60% {
     opacity: 0.34;
   }
@@ -862,7 +869,7 @@ body {
     opacity: 0.78;
   }
 
-  /* one snap out to fake you out, then it strikes (2592 - 2808ms) */
+  /* one snap out to fake you out, then it strikes (1728 - 1872ms) */
   72% {
     opacity: 0.1;
   }
@@ -889,7 +896,7 @@ body {
    2/9/20/30 high, 25 dip, 70 mid, 72 dip, 77 high) driving box-shadow blur and
    spread instead of opacity: the halo actually swells and collapses, which is
    the one thing transparency cannot fake. Ends at zero bloom so the idle glow
-   is exactly the frame's own static shadow. 3.4s, so 1% = 34ms. */
+   is exactly the frame's own static shadow. 2.27s, so 1% = 22.7ms. */
 @keyframes terminal-power-bloom {
   0%, 8%, 12% {
     opacity: 0.1;
@@ -929,7 +936,7 @@ body {
    (0/2/21 low, 4/19/80 mid, 23/87 high, 83 dip) on border-color: a white-hot
    hairline over the accent border, the bit that lights before the tube does.
    Fades to fully transparent, so nothing of it survives into idle.
-   2.9s, so 1% = 29ms. */
+   1.93s, so 1% = 19.3ms. */
 @keyframes terminal-power-electrode {
   0%, 2%, 21% {
     opacity: 0.2;
@@ -961,6 +968,123 @@ body {
   }
 }
 
+/* layer 4 - the skip button. A small tube strikes faster than a big one, so
+   this one gets a false catch in before the frame even tries, sits out the
+   frame's first attempt entirely, and is settled well before the current is.
+   The lamp's faulty-flicker low/high stutter again, but landing on 0.55 instead
+   of on 1: that is the button's normal resting glow. 1.7s, so 1% = 17ms. */
+@keyframes terminal-power-skip {
+  /* a quick false catch, gone again in two frames (136 - 238ms) */
+  0%, 8% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.45;
+  }
+  12% {
+    opacity: 0.05;
+  }
+
+  /* out cold while the frame is having its own first go (238 - 510ms) */
+  14%, 30% {
+    opacity: 0;
+  }
+
+  /* it catches, badly (561 - 629ms) */
+  33% {
+    opacity: 0.62;
+  }
+  35% {
+    opacity: 0.1;
+  }
+  37% {
+    opacity: 0.5;
+  }
+
+  /* its own dead beat, on nobody else's clock (663 - 986ms) */
+  39%, 58% {
+    opacity: 0;
+  }
+
+  /* strike: a surge over the resting glow, one snap out, then it holds */
+  63% {
+    opacity: 0.3;
+  }
+  70% {
+    opacity: 0.85;
+  }
+  72% {
+    opacity: 0.12;
+  }
+  76% {
+    opacity: 0.72;
+  }
+  88% {
+    opacity: 0.48;
+  }
+  94%, 100% {
+    opacity: 0.55;
+  }
+}
+
+/* layer 5 - the copy button. Same idea, different tube: slower to wake, one
+   long confident stretch in the middle, and it is the last of the two to hold.
+   2.15s, so 1% = 21.5ms. */
+@keyframes terminal-power-copy {
+  /* dark long after the skip button has already tried (0 - 301ms) */
+  0%, 14% {
+    opacity: 0;
+  }
+
+  /* a lazy creep that drops out again (366 - 452ms) */
+  17% {
+    opacity: 0.2;
+  }
+  19% {
+    opacity: 0.55;
+  }
+  21% {
+    opacity: 0.04;
+  }
+  23%, 44% {
+    opacity: 0;
+  }
+
+  /* attempt 2, straight through the frame's long empty beat (1010 - 1118ms) */
+  47% {
+    opacity: 0.7;
+  }
+  49% {
+    opacity: 0.15;
+  }
+  52% {
+    opacity: 0.6;
+  }
+
+  /* barely alight, then the strike (1161 - 1677ms) */
+  54%, 66% {
+    opacity: 0.03;
+  }
+  71% {
+    opacity: 0.4;
+  }
+  78% {
+    opacity: 0.9;
+  }
+  81% {
+    opacity: 0.18;
+  }
+  85% {
+    opacity: 0.68;
+  }
+  92% {
+    opacity: 0.5;
+  }
+  97%, 100% {
+    opacity: 0.55;
+  }
+}
+
 /* the frame is its own layer so the border can flicker without the text flickering along.
    phase 3 only has to swap this single run for an infinite one. */
 .neon-terminal__frame {
@@ -973,7 +1097,7 @@ body {
     0px 0px 0.5em 0px var(--accent);
   box-shadow: inset 0px 0px 0.5em 0px var(--accent),
     0px 0px 0.5em 0px var(--accent);
-  animation: terminal-power-current 3.6s linear 1 both;
+  animation: terminal-power-current 2.4s linear 1 both;
 }
 /* both extra layers sit on the frame's border box (inset -1px cancels its
    1px border) and default to invisible, so with animation: none they simply
@@ -988,11 +1112,11 @@ body {
   opacity: 0;
 }
 .neon-terminal__frame::before {
-  animation: terminal-power-bloom 3.4s linear 1 both;
+  animation: terminal-power-bloom 2.27s linear 1 both;
 }
 .neon-terminal__frame::after {
   border: 1px solid transparent;
-  animation: terminal-power-electrode 2.9s linear 1 both;
+  animation: terminal-power-electrode 1.93s linear 1 both;
 }
 .neon-terminal--still .neon-terminal__frame,
 .neon-terminal--still .neon-terminal__frame::before,
@@ -1022,6 +1146,17 @@ body {
   cursor: pointer;
   opacity: 0.55;
   transition: 0.3s;
+}
+/* No fill mode on purpose: the run ends exactly on the 0.55 above, and from
+   that moment the property is plain CSS again, so hover, :disabled and the
+   phase 3 flicker all behave as if the power-on never happened. Both sit before
+   the --faulty rule below, which shares their specificity and therefore wins
+   once the terminal is alive. */
+.neon-terminal__btn--skip {
+  animation: terminal-power-skip 1.7s linear 1;
+}
+.neon-terminal__btn--copy {
+  animation: terminal-power-copy 2.15s linear 1;
 }
 .neon-terminal__btn:hover:not(:disabled) {
   opacity: 1;
@@ -1123,6 +1258,17 @@ body {
   /* the negative delay starts the loop past its opening dip, so the handover
      from the power-on (which ends at full strength) has no step in brightness */
   animation: border-flicker-idle 5s linear -0.5s infinite;
+}
+
+/* going alive is also the hard end of the power-on: the leftover layers are
+   dropped instead of being left to finish. On the normal run they have already
+   tapered out by then, so nothing changes; when the user skips the power-on the
+   sign snaps to fully lit instead of flickering on without it. The skip button
+   needs no rule here - its --faulty flicker replaces the power-on by itself. */
+.neon-terminal--alive .neon-terminal__frame::before,
+.neon-terminal--alive .neon-terminal__frame::after,
+.neon-terminal--alive .neon-terminal__btn--copy {
+  animation: none;
 }
 
 /* the steady majority: one slow shared breath, nothing jumpy */

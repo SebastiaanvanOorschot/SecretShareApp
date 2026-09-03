@@ -110,3 +110,4 @@ nul
 
 # ===== Claude =====
 .claude/
+gitleaks-*.json

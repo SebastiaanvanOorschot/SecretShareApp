@@ -20,12 +20,14 @@ namespace SecretShareApi.Tests
 
         public SebasDbContext CreateContext()
         {
-            var options = new DbContextOptionsBuilder<SebasDbContext>()
-                .UseSqlite(_connection)
-                .Options;
+            var builder = new DbContextOptionsBuilder<SebasDbContext>();
+            Configure(builder);
 
-            return new SebasDbContext(options);
+            return new SebasDbContext(builder.Options);
         }
+
+        /// Points a context at this database, e.g. for AddDbContext in a test service collection.
+        public void Configure(DbContextOptionsBuilder builder) => builder.UseSqlite(_connection);
 
         public void Dispose() => _connection.Dispose();
     }

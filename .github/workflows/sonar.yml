@@ -38,7 +38,7 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: SecretShareFrontEnd
-        run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile --ignore-scripts
 
       - name: Run frontend unit tests
         working-directory: SecretShareFrontEnd
@@ -125,7 +125,7 @@ jobs:
       - name: Collect frontend coverage
         working-directory: SecretShareFrontEnd
         run: |
-          yarn install --frozen-lockfile
+          yarn install --frozen-lockfile --ignore-scripts
           yarn test:coverage
 
       - name: End analysis

@@ -203,6 +203,23 @@ namespace SecretShareApi.Tests.Repositories
             Assert.Equal("", await Retrieve(url, Passphrase));
         }
 
+        [Theory]
+        [InlineData("phrase ", "phrase ")]
+        [InlineData(" phrase", " phrase")]
+        [InlineData("phrase ", "phrase")]
+        [InlineData("phrase", "  phrase\t")]
+        public async Task VerifyAndDecryptSecret_PassphraseWhitespace_IsIgnoredOnBothSides(string storePassphrase, string retrievePassphrase)
+        {
+            // Regression: the secret used to be encrypted with the trimmed passphrase while the token
+            // and decryption used the raw one, so "phrase " matched the token and then failed to decrypt
+            var url = await Store("my secret", passphrase: storePassphrase);
+
+            var secret = await Retrieve(url, retrievePassphrase);
+
+            Assert.Equal("my secret", secret);
+            Assert.Empty(Rows());
+        }
+
         // ---- helpers ---------------------------------------------------------
 
         // Store and Retrieve clear the change tracker afterwards: in the API every request gets its

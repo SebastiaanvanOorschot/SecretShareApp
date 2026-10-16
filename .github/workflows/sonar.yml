@@ -11,7 +11,8 @@ on:
 
 jobs:
   # Losse job zodat dit als required check gebruikt kan worden: een falende test
-  # blokkeert, ook als SonarCloud zelf onbereikbaar is.
+  # blokkeert, ook als SonarCloud zelf onbereikbaar is. Backend en frontend zitten
+  # in dezelfde job, zodat die ene required check "Unit tests" beide afdekt.
   test:
     name: Unit tests
     runs-on: ubuntu-latest
@@ -25,8 +26,23 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Run unit tests
+      - name: Run backend unit tests
         run: dotnet test SecretShareApi/SecretShareApi.sln --configuration Release
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: yarn
+          cache-dependency-path: SecretShareFrontEnd/yarn.lock
+
+      - name: Install frontend dependencies
+        working-directory: SecretShareFrontEnd
+        run: yarn install --frozen-lockfile
+
+      - name: Run frontend unit tests
+        working-directory: SecretShareFrontEnd
+        run: yarn test
 
   sonar:
     name: Analyse
@@ -69,9 +85,10 @@ jobs:
             /o:"sebastiaanvanoorschot" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="$SONAR_TOKEN" \
-            /d:sonar.exclusions="**/node_modules/**,**/dist/**,**/bin/**,**/obj/**" \
+            /d:sonar.exclusions="**/node_modules/**,**/dist/**,**/bin/**,**/obj/**,**/coverage/**" \
             /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml" \
-            /d:sonar.coverage.exclusions="**/Migrations/**,**/Program.cs"
+            /d:sonar.javascript.lcov.reportPaths="SecretShareFrontEnd/coverage/lcov.info" \
+            /d:sonar.coverage.exclusions="**/Migrations/**,**/Program.cs,**/__tests__/**,SecretShareFrontEnd/src/main.ts,SecretShareFrontEnd/vite.config.mts"
 
       - name: Build backend
         run: dotnet build SecretShareApi/SecretShareApi.sln --configuration Release
@@ -81,6 +98,19 @@ jobs:
         run: >
           dotnet test SecretShareApi/SecretShareApi.sln --configuration Release --no-build
           --collect:"XPlat Code Coverage;Format=opencover"
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: yarn
+          cache-dependency-path: SecretShareFrontEnd/yarn.lock
+
+      - name: Collect frontend coverage
+        working-directory: SecretShareFrontEnd
+        run: |
+          yarn install --frozen-lockfile
+          yarn test:coverage
 
       - name: End analysis
         env:

@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig, loadEnv } from 'vite'
@@ -22,6 +23,22 @@ export default ({ mode }) => {
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
+      }
+    },
+    test: {
+      environment: 'jsdom',
+      include: ['src/**/__tests__/**/*.spec.ts'],
+      restoreMocks: true,
+      unstubEnvs: true,
+      unstubGlobals: true,
+      coverage: {
+        provider: 'v8',
+        // without this, v8 maps SFC lines loosely and a stubbed component can show as fully covered
+        experimentalAstAwareRemapping: true,
+        // lcov paths relative to the repo root, which is where Sonar resolves them from
+        reporter: ['text', ['lcov', { projectRoot: '..' }]],
+        include: ['src/**/*.{ts,vue}'],
+        exclude: ['src/**/__tests__/**', 'src/main.ts']
       }
     }
   })
